@@ -1,0 +1,14 @@
+.card {
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  overflow: hidden;
+}
+.default { border: 1px solid var(--color-border); }
+.outlined { border: 1px solid var(--color-border-strong); }
+.raised { border: 1px solid var(--color-border); box-shadow: var(--shadow-md); }
+.header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+.header h2, .header h3, .header h4 { margin: 0; }
+.content { padding: var(--space-4) var(--space-5); }
