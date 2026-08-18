@@ -1,0 +1,105 @@
+.container {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background-color: var(--color-surface);
+}
+
+.metricsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.metricsMetrics {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.metricItem strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+}
+
+.tableViewport {
+  height: 520px;
+  overflow: auto;
+  position: relative;
+  will-change: transform;
+}
+
+.virtualTable {
+  display: grid;
+  width: 100%;
+}
+
+.thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: var(--color-bg-secondary);
+  border-bottom: 2px solid var(--color-border);
+  display: flex;
+  width: 100%;
+}
+
+.th {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.th:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.sortIcon {
+  font-size: 0.7em;
+}
+
+.virtualRow {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  transition: background-color var(--transition-fast);
+}
+
+.virtualRow:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.td {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 120px;
+}
+
+.nullValue {
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
