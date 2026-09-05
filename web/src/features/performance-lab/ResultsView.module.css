@@ -1,0 +1,154 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.envCard {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.envItem strong {
+  color: var(--color-text-primary);
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+.comparisonCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  background-color: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.comparisonHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metricTitle {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.resultHighlight {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.percentageBig {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  font-family: var(--font-mono);
+}
+
+.improvement {
+  color: var(--color-improvement);
+}
+
+.regression {
+  color: var(--color-regression);
+}
+
+.neutral {
+  color: var(--color-neutral);
+}
+
+.speedup {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.comparisonTable {
+  width: 100%;
+  font-size: var(--text-xs);
+  border-collapse: collapse;
+}
+
+.comparisonTable th,
+.comparisonTable td {
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  text-align: right;
+}
+
+.comparisonTable th:first-child,
+.comparisonTable td:first-child {
+  text-align: left;
+}
+
+.samplesStrip {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.stripLabel {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.sampleDots {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.baselineDot {
+  background-color: var(--color-border-strong);
+}
+
+.optimizedDot {
+  background-color: var(--color-accent);
+}
+
+.warningBox {
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-warning-subtle);
+  border-left: 3px solid var(--color-warning);
+  font-size: var(--text-xs);
+  color: #856404;
+  border-radius: var(--radius-sm);
+}
+
+.exportBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
