@@ -1,11 +1,13 @@
 import { generateDataset } from '../../../lib/dataset-generator';
-import type { BenchmarkSample } from '../../../types';
+import type { BenchmarkSample, DataRecord } from '../../../types';
 
 export interface ExperimentARunOptions {
   rowCount: number;
   seed: number;
   warmupRuns: number;
   measuredRuns: number;
+  customRecords?: DataRecord[];
+  columnNames?: string[];
   onProgress?: (progress: { current: number; total: number; status: string }) => void;
   shouldCancel?: () => boolean;
 }
@@ -16,11 +18,15 @@ export interface ExperimentARunOptions {
 export async function runExperimentA(
   options: ExperimentARunOptions
 ): Promise<BenchmarkSample[]> {
-  const { rowCount, seed, warmupRuns, measuredRuns, onProgress, shouldCancel } = options;
+  const { rowCount, seed, warmupRuns, measuredRuns, customRecords, columnNames: userColumns, onProgress, shouldCancel } = options;
   const samples: BenchmarkSample[] = [];
 
-  // Generate identical dataset outside of timed operations
-  const dataset = generateDataset(seed, rowCount);
+  // Use custom dataset if provided, else generate synthetic
+  const dataset = customRecords && customRecords.length > 0
+    ? customRecords
+    : generateDataset(seed, rowCount);
+
+  const effectiveRowCount = dataset.length;
 
   // Hidden test benchmark container
   const container = document.createElement('div');
@@ -38,8 +44,10 @@ export async function runExperimentA(
   try {
     // 1. BASELINE RUNS (Full unvirtualized DOM render)
     // For safety, cap baseline at 5,000 rows to prevent browser freeze
-    const baselineRecords = dataset.slice(0, Math.min(rowCount, 5000));
-    const columnNames = ['id', 'name', 'email', 'date', 'category', 'status', 'region', 'amount', 'quantity'];
+    const baselineRecords = dataset.slice(0, Math.min(effectiveRowCount, 5000));
+    const columnNames = userColumns && userColumns.length > 0
+      ? userColumns
+      : (dataset[0] ? Object.keys(dataset[0]).slice(0, 10) : ['id', 'name', 'email', 'date', 'category', 'status', 'region', 'amount', 'quantity']);
 
     for (let i = 0; i < warmupRuns + measuredRuns; i++) {
       if (shouldCancel?.()) throw new Error('Benchmark cancelled by user.');
@@ -115,7 +123,7 @@ export async function runExperimentA(
 
     // 2. OPTIMIZED RUNS (Virtualized slice - only visible window + buffer)
     const virtualWindowSize = 25; // 25 rows visible in 600px viewport + 10 overscan = 35 total
-    const virtualSlice = dataset.slice(0, Math.min(rowCount, virtualWindowSize));
+    const virtualSlice = dataset.slice(0, Math.min(effectiveRowCount, virtualWindowSize));
 
     for (let i = 0; i < warmupRuns + measuredRuns; i++) {
       if (shouldCancel?.()) throw new Error('Benchmark cancelled by user.');
@@ -136,7 +144,7 @@ export async function runExperimentA(
       vContainer.style.overflow = 'hidden';
 
       const spacer = document.createElement('div');
-      spacer.style.height = `${rowCount * 40}px`;
+      spacer.style.height = `${effectiveRowCount * 40}px`;
       spacer.style.position = 'relative';
 
       for (let r = 0; r < virtualSlice.length; r++) {

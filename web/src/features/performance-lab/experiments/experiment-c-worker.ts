@@ -1,13 +1,15 @@
 import { generateDataset, DATASET_COLUMNS } from '../../../lib/dataset-generator';
 import { computeAllStats } from '../../../lib/analytics';
 import { workerClient } from '../../../services/worker-client';
-import type { BenchmarkSample } from '../../../types';
+import type { BenchmarkSample, DataRecord, ColumnSchema } from '../../../types';
 
 export interface ExperimentCRunOptions {
   rowCount: number;
   seed: number;
   warmupRuns: number;
   measuredRuns: number;
+  customRecords?: DataRecord[];
+  customColumns?: ColumnSchema[];
   onProgress?: (progress: { current: number; total: number; status: string }) => void;
   shouldCancel?: () => boolean;
 }
@@ -18,10 +20,17 @@ export interface ExperimentCRunOptions {
 export async function runExperimentC(
   options: ExperimentCRunOptions
 ): Promise<BenchmarkSample[]> {
-  const { rowCount, seed, warmupRuns, measuredRuns, onProgress, shouldCancel } = options;
+  const { rowCount, seed, warmupRuns, measuredRuns, customRecords, customColumns, onProgress, shouldCancel } = options;
   const samples: BenchmarkSample[] = [];
 
-  const dataset = generateDataset(seed, rowCount);
+  const dataset = customRecords && customRecords.length > 0
+    ? customRecords
+    : generateDataset(seed, rowCount);
+
+  const columns = customColumns && customColumns.length > 0
+    ? customColumns
+    : DATASET_COLUMNS;
+
   const totalRuns = (warmupRuns + measuredRuns) * 2;
   let currentRun = 0;
 
@@ -36,7 +45,7 @@ export async function runExperimentC(
     });
 
     const t0 = performance.now();
-    computeAllStats(dataset, DATASET_COLUMNS);
+    computeAllStats(dataset, columns);
     const t1 = performance.now();
     const duration = t1 - t0;
 
@@ -77,7 +86,7 @@ export async function runExperimentC(
 
     // Measure time spent blocking the main thread while dispatching to worker
     const dispatchStart = performance.now();
-    const workerPromise = workerClient.computeAnalytics(dataset, DATASET_COLUMNS);
+    const workerPromise = workerClient.computeAnalytics(dataset, columns);
     const dispatchEnd = performance.now();
     const mainThreadBlock = dispatchEnd - dispatchStart;
 

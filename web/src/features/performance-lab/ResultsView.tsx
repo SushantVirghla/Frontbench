@@ -72,8 +72,15 @@ export function ResultsView({ run }: ResultsViewProps) {
     <div className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h3>Benchmark Results: {run.suiteKey}</h3>
-          <Badge variant="success">Measured Locally</Badge>
+          <h3>Benchmark Results: {run.suiteKey.replace(/_/g, ' ').toUpperCase()}</h3>
+          <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-1)' }}>
+            <Badge variant="success">Measured Live</Badge>
+            {run.source && (
+              <Badge variant={run.source === 'local' ? 'info' : 'default'}>
+                {run.source === 'local' ? '💾 IndexedDB' : '🗄️ PostgreSQL'}
+              </Badge>
+            )}
+          </div>
         </div>
         <div className={styles.exportBar}>
           <Button variant="secondary" size="sm" onClick={handleDownloadCSV}>
@@ -86,6 +93,9 @@ export function ResultsView({ run }: ResultsViewProps) {
       </div>
 
       <div className={styles.envCard}>
+        <div className={styles.envItem}>
+          <span>Workload:</span> <strong>{run.datasetName || 'Synthetic'}</strong>
+        </div>
         <div className={styles.envItem}>
           <span>Browser:</span> <strong>{run.environment.browserName} {run.environment.browserVersion}</strong>
         </div>

@@ -81,6 +81,8 @@ export interface BenchmarkRun {
   id: string;
   suiteKey: string;
   datasetProfileId: string | null;
+  datasetName?: string | null;
+  source?: 'local' | 'api';
   rowCount: number;
   randomSeed: number | null;
   buildId: string | null;

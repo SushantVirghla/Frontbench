@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
-import type { DatasetProfile, DataRecord } from '../types';
+import type { DatasetProfile, DataRecord, BenchmarkRun } from '../types';
 
 export interface StoredRecord {
   internalId?: number;
@@ -21,6 +21,7 @@ class FrontBenchDatabase extends Dexie {
   profiles!: EntityTable<DatasetProfile, 'id'>;
   records!: EntityTable<StoredRecord, 'internalId'>;
   preferences!: EntityTable<ViewPreference, 'id'>;
+  benchmarks!: EntityTable<BenchmarkRun, 'id'>;
 
   constructor() {
     super('FrontBenchDB');
@@ -28,6 +29,12 @@ class FrontBenchDatabase extends Dexie {
       profiles: 'id, name, sourceType, rowCount, createdAt',
       records: '++internalId, datasetId, recordId',
       preferences: 'id, datasetId',
+    });
+    this.version(2).stores({
+      profiles: 'id, name, sourceType, rowCount, createdAt',
+      records: '++internalId, datasetId, recordId',
+      preferences: 'id, datasetId',
+      benchmarks: 'id, suiteKey, rowCount, createdAt',
     });
   }
 }
@@ -95,4 +102,33 @@ export async function deleteDatasetLocally(datasetId: string): Promise<void> {
     await db.profiles.delete(datasetId);
     await db.preferences.where('datasetId').equals(datasetId).delete();
   });
+}
+
+/**
+ * Save a benchmark run locally to IndexedDB.
+ */
+export async function saveBenchmarkRunLocally(run: BenchmarkRun): Promise<void> {
+  await db.benchmarks.put(run);
+}
+
+/**
+ * Load all recorded benchmark runs from IndexedDB ordered from newest to oldest.
+ */
+export async function loadBenchmarkRunsLocally(): Promise<BenchmarkRun[]> {
+  const items = await db.benchmarks.orderBy('createdAt').reverse().toArray();
+  return items.map((item) => ({ ...item, source: 'local' as const }));
+}
+
+/**
+ * Delete a specific benchmark run from IndexedDB.
+ */
+export async function deleteBenchmarkRunLocally(id: string): Promise<void> {
+  await db.benchmarks.delete(id);
+}
+
+/**
+ * Clear all local benchmark runs from IndexedDB.
+ */
+export async function clearAllBenchmarkRunsLocally(): Promise<void> {
+  await db.benchmarks.clear();
 }

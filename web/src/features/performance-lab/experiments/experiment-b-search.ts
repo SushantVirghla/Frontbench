@@ -1,12 +1,13 @@
 import { generateDataset, BENCHMARK_SEARCH_TERMS } from '../../../lib/dataset-generator';
 import { baselineSearch, buildSearchIndex, optimizedSearch } from '../../../lib/search';
-import type { BenchmarkSample } from '../../../types';
+import type { BenchmarkSample, DataRecord } from '../../../types';
 
 export interface ExperimentBRunOptions {
   rowCount: number;
   seed: number;
   warmupRuns: number;
   measuredRuns: number;
+  customRecords?: DataRecord[];
   onProgress?: (progress: { current: number; total: number; status: string }) => void;
   shouldCancel?: () => boolean;
 }
@@ -17,16 +18,34 @@ export interface ExperimentBRunOptions {
 export async function runExperimentB(
   options: ExperimentBRunOptions
 ): Promise<BenchmarkSample[]> {
-  const { rowCount, seed, warmupRuns, measuredRuns, onProgress, shouldCancel } = options;
+  const { rowCount, seed, warmupRuns, measuredRuns, customRecords, onProgress, shouldCancel } = options;
   const samples: BenchmarkSample[] = [];
 
-  // Generate dataset outside timing
-  const dataset = generateDataset(seed, rowCount);
+  // Generate or use custom dataset outside timing
+  const dataset = customRecords && customRecords.length > 0
+    ? customRecords
+    : generateDataset(seed, rowCount);
 
   // Pre-build index for the optimized variant
   const searchIndex = buildSearchIndex(dataset);
 
-  const queryTerms = [...BENCHMARK_SEARCH_TERMS];
+  let queryTerms: string[] = [...BENCHMARK_SEARCH_TERMS];
+  if (customRecords && customRecords.length > 0) {
+    const extractedTerms = new Set<string>();
+    for (const record of customRecords.slice(0, 50)) {
+      for (const val of Object.values(record)) {
+        if (typeof val === 'string' && val.trim().length >= 3) {
+          extractedTerms.add(val.trim().slice(0, 5));
+          if (extractedTerms.size >= 10) break;
+        }
+      }
+      if (extractedTerms.size >= 10) break;
+    }
+    if (extractedTerms.size > 0) {
+      queryTerms = Array.from(extractedTerms);
+    }
+  }
+
   const totalRuns = (warmupRuns + measuredRuns) * 2;
   let currentRun = 0;
 

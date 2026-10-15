@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import styles from './Layout.module.css';
 
 const NAV_ITEMS = [
@@ -10,8 +10,22 @@ const NAV_ITEMS = [
   { to: '/benchmark-history', label: 'Benchmark History', icon: '📋' },
 ];
 
+const ROUTE_TITLES: Record<string, string> = {
+  '/': 'Overview | FrontBench',
+  '/explorer': 'Data Explorer | FrontBench',
+  '/analytics': 'Analytics | FrontBench',
+  '/performance-lab': 'Performance Lab | FrontBench',
+  '/benchmark-history': 'Benchmark History | FrontBench',
+};
+
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const title = ROUTE_TITLES[location.pathname] || 'FrontBench — High-Performance Data Explorer';
+    document.title = title;
+  }, [location.pathname]);
 
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const toggleSidebar = useCallback(() => setSidebarOpen((prev) => !prev), []);
