@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "description": "FRONTBENCH — High-Performance Data Explorer and Microbenchmark Lab",
+  "workspaces": [
+    "web",
+    "api"
+  ],
   "scripts": {
     "dev": "npm --prefix web run dev",
     "dev:web": "npm --prefix web run dev",
